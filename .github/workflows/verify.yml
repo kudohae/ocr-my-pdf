@@ -1,0 +1,16 @@
+name: Verify OCR
+on:
+  push:
+  pull_request:
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t pdf-ocr .
+      - name: Check language packs and OCR
+        run: |
+          docker run --rm --entrypoint tesseract pdf-ocr --list-langs | grep -E '^kor$'
+          docker run --rm --entrypoint python pdf-ocr scripts/smoke_ocr.py
