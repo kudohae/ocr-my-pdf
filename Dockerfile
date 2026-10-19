@@ -13,14 +13,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-eng \
     tesseract-ocr-kor \
+    tesseract-ocr-rus \
     unpaper \
     && rm -rf /var/lib/apt/lists/*
 
-# Use Tesseract's accuracy-focused language models for Korean and English.
+# Use Tesseract's accuracy-focused language models for Korean, English, and Russian.
 RUN curl -fsSL https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/4.1.0/kor.traineddata \
       -o /usr/share/tesseract-ocr/5/tessdata/kor.traineddata \
     && curl -fsSL https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/4.1.0/eng.traineddata \
-      -o /usr/share/tesseract-ocr/5/tessdata/eng.traineddata
+      -o /usr/share/tesseract-ocr/5/tessdata/eng.traineddata \
+    && curl -fsSL https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/4.1.0/rus.traineddata \
+      -o /usr/share/tesseract-ocr/5/tessdata/rus.traineddata
 
 WORKDIR /app
 COPY requirements.txt .

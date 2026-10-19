@@ -51,3 +51,21 @@ def test_upload_limit(tmp_path):
             response = client.post("/ocr", files={"file": ("large.pdf", b"%PDF-1.4")})
         assert response.status_code == 413
         assert not (tmp_path / "large").exists()
+
+
+def test_russian_language_is_passed_to_ocrmypdf(tmp_path):
+    commands = []
+
+    async def recording_ocr(*command, **kwargs):
+        commands.append(command)
+        return await fake_ocr(*command, **kwargs)
+
+    with patch.object(main.tempfile, "mkdtemp", return_value=str(tmp_path / "rus")), \
+         patch.object(main.asyncio, "create_subprocess_exec", side_effect=recording_ocr):
+        (tmp_path / "rus").mkdir()
+        with TestClient(main.app) as client:
+            response = client.post(
+                "/ocr", data={"language": "rus+eng"}, files={"file": ("документ.pdf", b"%PDF-1.4\nscan")}
+            )
+        assert response.status_code == 200
+        assert commands[0][1:3] == ("--language", "rus+eng")
