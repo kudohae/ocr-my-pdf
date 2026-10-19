@@ -1,6 +1,7 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app import main
@@ -53,7 +54,8 @@ def test_upload_limit(tmp_path):
         assert not (tmp_path / "large").exists()
 
 
-def test_russian_language_is_passed_to_ocrmypdf(tmp_path):
+@pytest.mark.parametrize("language", ["rus+eng", "kor+rus"])
+def test_russian_language_is_passed_to_ocrmypdf(tmp_path, language):
     commands = []
 
     async def recording_ocr(*command, **kwargs):
@@ -65,7 +67,7 @@ def test_russian_language_is_passed_to_ocrmypdf(tmp_path):
         (tmp_path / "rus").mkdir()
         with TestClient(main.app) as client:
             response = client.post(
-                "/ocr", data={"language": "rus+eng"}, files={"file": ("документ.pdf", b"%PDF-1.4\nscan")}
+                "/ocr", data={"language": language}, files={"file": ("документ.pdf", b"%PDF-1.4\nscan")}
             )
         assert response.status_code == 200
-        assert commands[0][1:3] == ("--language", "rus+eng")
+        assert commands[0][1:3] == ("--language", language)
