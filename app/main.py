@@ -14,7 +14,7 @@ from starlette.background import BackgroundTask
 APP_DIR = Path(__file__).resolve().parent
 MAX_UPLOAD_BYTES = 100 * 1024 * 1024
 OCR_TIMEOUT_SECONDS = 15 * 60
-LANGUAGES = {"kor+eng", "kor", "eng", "rus+eng", "rus"}
+LANGUAGES = {"kor+eng", "kor", "eng", "rus+eng", "rus", "kor+rus"}
 OCR_SLOTS = asyncio.Semaphore(2)
 
 app = FastAPI(title="PDF OCR", docs_url=None, redoc_url=None)
